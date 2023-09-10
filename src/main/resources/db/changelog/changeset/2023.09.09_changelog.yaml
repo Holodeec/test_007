@@ -1,0 +1,155 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1 create-author-table
+      author: Umar
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: authors
+        - onFail: MARK_RAN
+      changes:
+        - createTable:
+            tableName: authors
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 2 create-book-table
+      author: Umar
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: books
+        - onFail: MARK_RAN
+      changes:
+        - createTable:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: genre_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 3 create-genre-table
+      author: Umar
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: genre
+        - onFail: MARK_RAN
+      changes:
+        - createTable:
+            tableName: genre
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: nvarchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+
+  - changeSet:
+      id: 4 create-author-book-table
+      author: Umar
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: author-book
+        - onFail: MARK_RAN
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: genre_id
+            baseTableName: books
+            constraintName: fk_book_genre
+            referencedColumnNames: id
+            referencedTableName: genre
+
+  - changeSet:
+      id: 5 create-book-author-table
+      author: Umar
+      preConditions:
+        - not:
+            - tableExists:
+                tableName: book_author
+        - onFail: MARK_RAN
+      changes:
+        - createTable:
+            tableName: book_author
+            columns:
+              - column:
+                  name: author_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_book_author_author
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_book_author_book
+
+  - changeSet:
+      id: 6
+      author: Umar
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: book_id
+            baseTableName: book_author
+            constraintName: fk_book_author_book
+            referencedColumnNames: id
+            referencedTableName: books
+        - addForeignKeyConstraint:
+            baseColumnNames: author_id
+            baseTableName: book_author
+            constraintName: fk_book_author_author
+            referencedColumnNames: id
+            referencedTableName: authors
+
+  - changeSet:
+      id: 7 testData
+      author: Umar
+      changes:
+        - sql: "INSERT INTO authors (name) VALUES ('Joanne Rowling'),('Napoleon Hill'),('James Borg')"
+
+        - sql: "INSERT INTO genre (name) VALUES ('Magic'),('Fiction'),('Psychology')"
+
+        - sql: "INSERT INTO books (genre_id, name) VALUES (1, 'Harry Potter'),(2, 'Think And Grow Rich'),(3, 'Secrets of Communication The Magic of Words')"
+        - sql: "insert into book_author (book_id, author_id) values (1,1),(2,2),(3,3)"
+
+
+
+
+
+

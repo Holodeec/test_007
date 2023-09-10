@@ -14,7 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 
@@ -46,16 +48,15 @@ class BookServiceImplTest {
         lenient().when(repository.findAll()).thenReturn(List.of(firstBook, secondBook));
         lenient().when(repository.save(firstBook)).thenReturn(firstBook);
         lenient().when(repository.findAllByNameStartingWith(LETTER)).thenReturn(List.of(firstBook, secondBook));
-        lenient().when(repository.findAllByOrderByName()).thenReturn(List.of(firstBook,secondBook));
+        lenient().when(repository.findAllByOrderByName()).thenReturn(List.of(firstBook, secondBook));
 
     }
 
     @Test
     void getBookById() {
-
-
         Book book = service.getBookById(BOOK_ID);
-        assertEquals(book.getId(),BOOK_ID);
+
+        assertEquals(book.getId(), BOOK_ID);
     }
 
     @Test
@@ -63,11 +64,12 @@ class BookServiceImplTest {
         Book book = service.createBook(firstBook);
 
         assertEquals(firstBook, book);
+
         verify(repository).save(firstBook);
     }
 
     @Test
-    void getAllBooksTrue() {
+    void getAllBooksIsCorrect() {
         List<Book> result = service.getAllBooks();
 
         assertEquals(2, result.size());
@@ -77,19 +79,21 @@ class BookServiceImplTest {
     void deleteBookById() {
         //todo
         service.deleteBookById(BOOK_ID);
+
         verify(repository).deleteById(BOOK_ID);
     }
 
     @Test
     void updateBook() {
         Book book = service.updateBook(firstBook);
+
         assertEquals(firstBook, book);
+
         verify(repository).save(firstBook);
     }
 
     @Test
     void getBooksOrderByName() {
-
         List<Book> result = service.getBooksOrderByName();
 
         assertEquals(FIRST_BOOK_NAME, result.get(0).getName());
@@ -98,14 +102,12 @@ class BookServiceImplTest {
 
     @Test
     void getBooksByLetterWhenOrderIsCorrect() {
-
         assertDoesNotThrow(() -> service.getBooksByLetter(LETTER));
         assertEquals(service.getBooksByLetter(LETTER), List.of(firstBook, secondBook));
     }
 
     @Test
     void getBooksByLetterWhenOrderIsIncorrect() {
-
         assertNotEquals(service.getBooksByLetter(LETTER), List.of(secondBook, firstBook));
     }
 }
